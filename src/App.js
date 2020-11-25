@@ -4,65 +4,73 @@ import { useState, useEffect, useRef } from 'react';
 
 function App() {
   const [breakLength, setBreakLength] = useState(5);
-  const [sessionLength, setSessionLength] = useState(1);
+  const [sessionLength, setSessionLength] = useState(25);
   const [secondsLeft, setSecondsLeft] = useState(sessionLength * 60);
   const [timerOn, setTimerOn] = useState(false);
+  const [isSession, setIsSession] = useState(true);
 
   let interval = useRef();
 
   useEffect(() => {
-    if (secondsLeft > 0) {
-      if (timerOn) startTimer();
-      else stopTimer();
-    } else {
-      stopTimer(interval.current);
-    }
+    if (timerOn) startClock();
+    else stopClock();
   }, [timerOn]);
 
-  const startTimer = () => {
+  const startClock = () => {
     interval.current = setInterval(() => {
-      setSecondsLeft(secondsLeft => secondsLeft - 1);
-    }, 100);
+      setSecondsLeft(prevTime => {
+        if (prevTime > 0) return prevTime - 1;
+        else {
+          // return a function that returns the new secondsLeft depending on if break or session.
+          // For now so doesnt break!
+          return 0;
+        }
+      });
+    }, 1000);
   };
 
-  const stopTimer = () => {
+  const stopClock = () => {
     clearInterval(interval.current);
   };
 
   const clockify = () => {
-    let minutes = Math.floor(secondsLeft / 60);
-    let seconds = Math.floor(secondsLeft - minutes * 60);
-    let clockifiedMinutes = minutes < 10 ? `0${minutes}` : minutes;
-    let clockifiedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+    const minutes = Math.floor(secondsLeft / 60);
+    const seconds = Math.floor(secondsLeft - minutes * 60);
+
+    const clockifiedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+    const clockifiedSeconds = seconds < 10 ? `0${seconds}` : seconds;
 
     return `${clockifiedMinutes}:${clockifiedSeconds}`;
   };
 
-  const reset = () => {
-    stopTimer();
-    setBreakLength(5);
-    setSessionLength(25);
-    setSecondsLeft(25 * 60);
-  };
-
   const breakIncrement = () => {
-    if (breakLength === 60) return;
-    setBreakLength(breakLength + 1);
+    if (breakLength === 60 || timerOn) return;
+    setBreakLength(breakLength => breakLength + 1);
   };
 
   const breakDecrement = () => {
-    if (breakLength === 1) return;
-    setBreakLength(breakLength - 1);
+    if (breakLength === 1 || timerOn) return;
+    setBreakLength(breakLength => breakLength - 1);
   };
 
   const sessionIncrement = () => {
-    if (sessionLength === 60) return;
-    setSessionLength(sessionLength + 1);
+    if (sessionLength === 60 || timerOn) return;
+    setSessionLength(sessionLength => sessionLength + 1);
+    setSecondsLeft(prevSeconds => prevSeconds + 60);
   };
 
   const sessionDecrement = () => {
-    if (sessionLength === 1) return;
-    setSessionLength(sessionLength - 1);
+    if (sessionLength === 1 || timerOn) return;
+    setSessionLength(sessionLength => sessionLength - 1);
+    setSecondsLeft(prevSeconds => prevSeconds - 60);
+  };
+
+  const reset = () => {
+    clearInterval(interval.current);
+    setTimerOn(false);
+    setSessionLength(25);
+    setBreakLength(5);
+    setSecondsLeft(25 * 60);
   };
 
   return (
