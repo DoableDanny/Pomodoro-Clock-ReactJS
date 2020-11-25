@@ -9,23 +9,38 @@ function App() {
   const [timerOn, setTimerOn] = useState(false);
   const [isSession, setIsSession] = useState(true);
 
+  // Stores the current interval Id between renders
   let interval = useRef();
 
+  let audioBeep = useRef();
+
   useEffect(() => {
-    if (timerOn) startClock();
+    if (timerOn) startClock(secondsLeft);
     else stopClock();
   }, [timerOn]);
 
-  const startClock = () => {
+  useEffect(() => {
+    if (timerOn) {
+      if (isSession) {
+        setSecondsLeft(sessionLength * 60);
+        startClock(sessionLength * 60);
+      } else {
+        setSecondsLeft(breakLength * 60);
+        startClock(breakLength * 60);
+      }
+    }
+  }, [isSession]);
+
+  const startClock = seconds => {
     interval.current = setInterval(() => {
-      setSecondsLeft(prevTime => {
-        if (prevTime > 0) return prevTime - 1;
-        else {
-          // return a function that returns the new secondsLeft depending on if break or session.
-          // For now so doesnt break!
-          return 0;
-        }
-      });
+      if (seconds > 0) {
+        seconds--;
+        setSecondsLeft(seconds);
+      } else {
+        if (audioBeep.current !== null) audioBeep.current.play();
+        clearInterval(interval.current);
+        setIsSession(isSession => !isSession);
+      }
     }, 1000);
   };
 
@@ -71,6 +86,8 @@ function App() {
     setSessionLength(25);
     setBreakLength(5);
     setSecondsLeft(25 * 60);
+    setIsSession(true);
+    audioBeep.current.load();
   };
 
   return (
@@ -101,7 +118,7 @@ function App() {
 
       {/* Time Left */}
       <div className="timer-container">
-        <h3 id="timer-label">Session</h3>
+        <h3 id="timer-label">{isSession ? 'Session' : 'Break'}</h3>
         <p id="time-left">{clockify()}</p>
       </div>
 
@@ -114,6 +131,12 @@ function App() {
           Reset
         </button>
       </div>
+      <audio
+        id="beep"
+        ref={audioBeep}
+        preload="auto"
+        src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
+      />
     </div>
   );
 }
