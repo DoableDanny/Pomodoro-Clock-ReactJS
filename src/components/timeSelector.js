@@ -11,9 +11,9 @@ export default function TimeSelector({
   decrement,
 }) {
   return (
-    <div>
+    <div className="time-selector">
       <h3 id={titleId}>{title}</h3>
-      <div>
+      <div className="time-buttons">
         <button id={decrementBtnId} onClick={decrement}>
           -
         </button>

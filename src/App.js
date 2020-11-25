@@ -1,4 +1,4 @@
-import './App.css';
+import './css/App.css';
 import TimeSelector from './components/timeSelector.js';
 import { useState, useEffect, useRef } from 'react';
 
@@ -95,26 +95,28 @@ function App() {
       <h1>Pomodoro Clock</h1>
 
       {/* Select session and break times */}
-      <TimeSelector
-        title="Break Length"
-        titleId="break-label"
-        time={breakLength}
-        timeID="break-length"
-        decrementBtnId="break-decrement"
-        incrementBtnId="break-increment"
-        increment={breakIncrement}
-        decrement={breakDecrement}
-      />
-      <TimeSelector
-        title="Session Length"
-        titleId="session-label"
-        timeID="session-length"
-        time={sessionLength}
-        decrementBtnId="session-decrement"
-        incrementBtnId="session-increment"
-        increment={sessionIncrement}
-        decrement={sessionDecrement}
-      />
+      <div className="time-selectors">
+        <TimeSelector
+          title="Break Length"
+          titleId="break-label"
+          time={breakLength}
+          timeID="break-length"
+          decrementBtnId="break-decrement"
+          incrementBtnId="break-increment"
+          increment={breakIncrement}
+          decrement={breakDecrement}
+        />
+        <TimeSelector
+          title="Session Length"
+          titleId="session-label"
+          timeID="session-length"
+          time={sessionLength}
+          decrementBtnId="session-decrement"
+          incrementBtnId="session-increment"
+          increment={sessionIncrement}
+          decrement={sessionDecrement}
+        />
+      </div>
 
       {/* Time Left */}
       <div className="timer-container">
